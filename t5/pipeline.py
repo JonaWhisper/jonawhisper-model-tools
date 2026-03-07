@@ -102,10 +102,21 @@ def step2_quantize(onnx_dir: Path, force: bool = False):
         print(f"    output: {int8.stat().st_size / 1024 / 1024:.1f} MB ({ratio:.0%})")
 
 
+def ensure_repo(api, repo: str):
+    """Create HuggingFace repo if it doesn't exist."""
+    try:
+        api.repo_info(repo_id=repo, repo_type="model")
+    except Exception:
+        org = repo.split("/")[0]
+        print(f"  [upload] creating repo {repo}")
+        api.create_repo(repo_id=repo, repo_type="model", exist_ok=True)
+
+
 def step3_upload(repo: str, onnx_dir: Path):
     """Step 3: Upload all files to HuggingFace."""
     from huggingface_hub import HfApi
     api = HfApi()
+    ensure_repo(api, repo)
     for name in UPLOAD_FILES:
         f = onnx_dir / name
         if f.exists():
