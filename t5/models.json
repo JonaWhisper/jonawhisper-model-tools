@@ -2,6 +2,7 @@
   {
     "id": "gec-t5-small",
     "source": "Unbabel/gec-t5_small",
+    "license": "apache-2.0",
     "repo": "JonaWhisper/jonawhisper-gec-t5-small-onnx",
     "label": "GEC T5 Small (60M, multilingual)",
     "files": ["encoder_model.onnx", "decoder_model.onnx"]
@@ -9,6 +10,7 @@
   {
     "id": "t5-spell-fr",
     "source": "fdemelo/t5-base-spell-correction-fr",
+    "license": "mit",
     "repo": "JonaWhisper/jonawhisper-t5-spell-fr-onnx",
     "label": "T5 Spell Correction FR (220M)",
     "files": ["encoder_model.onnx", "decoder_model.onnx"]
@@ -16,6 +18,7 @@
   {
     "id": "flanec-base",
     "source": "morenolq/flanec-base-cd",
+    "license": "mit",
     "repo": "JonaWhisper/jonawhisper-flanec-base-onnx",
     "label": "FlanEC Base (250M, EN)",
     "files": ["encoder_model.onnx", "decoder_model.onnx"]
@@ -23,6 +26,7 @@
   {
     "id": "flanec-large",
     "source": "morenolq/flanec-large-cd",
+    "license": "mit",
     "repo": "JonaWhisper/jonawhisper-flanec-large-onnx",
     "label": "FlanEC Large (800M, EN)",
     "files": ["encoder_model.onnx", "decoder_model.onnx"]

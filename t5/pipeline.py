@@ -57,12 +57,17 @@ tags:
   - text2text-generation
   - grammar-correction
 base_model: {source}
-license: gpl-3.0
+license: {license}
 ---
 
 # {label}
 
 ONNX export of [{source}](https://huggingface.co/{source}) for use with [JonaWhisper](https://github.com/jplot/jona-whisper).
+
+## License
+
+This model is distributed under the **{license}** license, inherited from the [original model]({source_url}).
+The conversion scripts are under GPL-3.0.
 
 ## Files
 
@@ -72,8 +77,6 @@ ONNX export of [{source}](https://huggingface.co/{source}) for use with [JonaWhi
 | `decoder_model.onnx` | FP32 | Decoder |
 | `encoder_model_int8.onnx` | INT8 | Encoder (quantized) |
 | `decoder_model_int8.onnx` | INT8 | Decoder (quantized) |
-
-## Usage
 
 INT8 models are ~75% smaller and ~2-3x faster with minimal quality loss.
 
@@ -178,7 +181,12 @@ def process_model(model: dict, upload: bool = False, force: bool = False):
 
     # Generate model card
     readme = onnx_dir / "README.md"
-    readme.write_text(MODEL_CARD_TEMPLATE.format(source=source, label=model["label"]))
+    readme.write_text(MODEL_CARD_TEMPLATE.format(
+        source=source,
+        source_url=f"https://huggingface.co/{source}",
+        label=model["label"],
+        license=model.get("license", "unknown"),
+    ))
 
     # Step 3: Upload
     if upload:
