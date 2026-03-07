@@ -71,7 +71,7 @@ def step1_convert(source: str, onnx_dir: Path, force: bool = False):
 
     subprocess.run(
         [
-            "optimum-cli", "export", "onnx",
+            sys.executable, "-m", "optimum.exporters.onnx",
             "--model", source,
             "--task", "text2text-generation",
             str(onnx_dir),
@@ -155,9 +155,9 @@ def main():
 
     # Check optimum is installed
     try:
-        subprocess.run(["optimum-cli", "--version"], capture_output=True, check=True)
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        print("ERROR: optimum-cli not installed. Run: pip install optimum[exporters]")
+        import optimum.exporters.onnx  # noqa: F401
+    except ImportError:
+        print("ERROR: optimum not installed. Run: pip install optimum[exporters]")
         sys.exit(1)
 
     models = load_models()

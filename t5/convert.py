@@ -53,7 +53,7 @@ def convert_model(source: str, output_dir: Path):
     print(f"  converting: {source} → ONNX")
     subprocess.run(
         [
-            "optimum-cli", "export", "onnx",
+            sys.executable, "-m", "optimum.exporters.onnx",
             "--model", source,
             "--task", "text2text-generation",
             str(output_dir),
@@ -121,9 +121,9 @@ def main():
 
     # Check optimum is installed
     try:
-        subprocess.run(["optimum-cli", "--version"], capture_output=True, check=True)
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        print("ERROR: optimum-cli not installed. Run: pip install optimum[exporters]")
+        import optimum.exporters.onnx  # noqa: F401
+    except ImportError:
+        print("ERROR: optimum not installed. Run: pip install optimum[exporters]")
         sys.exit(1)
 
     models = load_models()
