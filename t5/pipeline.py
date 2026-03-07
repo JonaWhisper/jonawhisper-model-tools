@@ -45,7 +45,40 @@ UPLOAD_FILES = [
     "tokenizer.json",
     "special_tokens_map.json",
     "tokenizer_config.json",
+    "README.md",
 ]
+
+MODEL_CARD_TEMPLATE = """\
+---
+library_name: onnxruntime
+tags:
+  - onnx
+  - t5
+  - text2text-generation
+  - grammar-correction
+base_model: {source}
+license: gpl-3.0
+---
+
+# {label}
+
+ONNX export of [{source}](https://huggingface.co/{source}) for use with [JonaWhisper](https://github.com/jplot/jona-whisper).
+
+## Files
+
+| File | Format | Description |
+|------|--------|-------------|
+| `encoder_model.onnx` | FP32 | Encoder |
+| `decoder_model.onnx` | FP32 | Decoder |
+| `encoder_model_int8.onnx` | INT8 | Encoder (quantized) |
+| `decoder_model_int8.onnx` | INT8 | Decoder (quantized) |
+
+## Usage
+
+INT8 models are ~75% smaller and ~2-3x faster with minimal quality loss.
+
+Converted with [jonawhisper-model-tools](https://github.com/JonaWhisper/jonawhisper-model-tools).
+"""
 
 
 def load_models():
@@ -142,6 +175,10 @@ def process_model(model: dict, upload: bool = False, force: bool = False):
 
     # Step 2: Quantize
     step2_quantize(onnx_dir, force=force)
+
+    # Generate model card
+    readme = onnx_dir / "README.md"
+    readme.write_text(MODEL_CARD_TEMPLATE.format(source=source, label=model["label"]))
 
     # Step 3: Upload
     if upload:
