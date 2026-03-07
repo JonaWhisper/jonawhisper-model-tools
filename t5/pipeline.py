@@ -23,7 +23,6 @@ Usage:
 import argparse
 import json
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -69,15 +68,8 @@ def step1_convert(source: str, onnx_dir: Path, force: bool = False):
         shutil.rmtree(onnx_dir)
     onnx_dir.mkdir(parents=True, exist_ok=True)
 
-    subprocess.run(
-        [
-            sys.executable, "-m", "optimum.exporters.onnx",
-            "--model", source,
-            "--task", "text2text-generation",
-            str(onnx_dir),
-        ],
-        check=True,
-    )
+    from optimum.exporters.onnx import main_export
+    main_export(model_name_or_path=source, task="text2text-generation", output=onnx_dir)
 
     for f in sorted(onnx_dir.glob("*.onnx")):
         print(f"    {f.name}: {f.stat().st_size / 1024 / 1024:.1f} MB")
@@ -112,14 +104,13 @@ def step2_quantize(onnx_dir: Path, force: bool = False):
 
 def step3_upload(repo: str, onnx_dir: Path):
     """Step 3: Upload all files to HuggingFace."""
+    from huggingface_hub import HfApi
+    api = HfApi()
     for name in UPLOAD_FILES:
         f = onnx_dir / name
         if f.exists():
             print(f"  [upload] {name} → {repo}")
-            subprocess.run(
-                ["huggingface-cli", "upload", repo, str(f), name],
-                check=True,
-            )
+            api.upload_file(path_or_fileobj=str(f), path_in_repo=name, repo_id=repo)
 
 
 def process_model(model: dict, upload: bool = False, force: bool = False):
@@ -155,9 +146,9 @@ def main():
 
     # Check optimum is installed
     try:
-        import optimum.exporters.onnx  # noqa: F401
+        from optimum.exporters.onnx import main_export  # noqa: F401
     except ImportError:
-        print("ERROR: optimum not installed. Run: pip install optimum[exporters]")
+        print("ERROR: optimum-onnx not installed. Run: pip install optimum-onnx[onnxruntime]")
         sys.exit(1)
 
     models = load_models()

@@ -20,7 +20,6 @@ Usage:
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -41,16 +40,14 @@ def load_models():
 
 
 def download_model(repo: str, filename: str, dest: Path):
-    """Download a file from HuggingFace using huggingface-cli."""
+    """Download a file from HuggingFace."""
     if dest.exists():
         print(f"  cached: {dest.name} ({dest.stat().st_size / 1024 / 1024:.1f} MB)")
         return
     dest.parent.mkdir(parents=True, exist_ok=True)
     print(f"  downloading: {repo}/{filename}")
-    subprocess.run(
-        ["huggingface-cli", "download", repo, filename, "--local-dir", str(dest.parent)],
-        check=True,
-    )
+    from huggingface_hub import hf_hub_download
+    hf_hub_download(repo_id=repo, filename=filename, local_dir=str(dest.parent))
 
 
 def quantize_file(fp32_path: Path, int8_path: Path):
@@ -71,10 +68,8 @@ def quantize_file(fp32_path: Path, int8_path: Path):
 def upload_file(repo: str, local_path: Path, remote_name: str):
     """Upload a file to HuggingFace."""
     print(f"  uploading: {remote_name} to {repo}")
-    subprocess.run(
-        ["huggingface-cli", "upload", repo, str(local_path), remote_name],
-        check=True,
-    )
+    from huggingface_hub import HfApi
+    HfApi().upload_file(path_or_fileobj=str(local_path), path_in_repo=remote_name, repo_id=repo)
 
 
 def process_model(model: dict, upload: bool = False, force: bool = False):

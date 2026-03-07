@@ -1,4 +1,3 @@
-optimum[exporters]
-onnxruntime
+optimum-onnx[onnxruntime]
 onnx
 huggingface-hub

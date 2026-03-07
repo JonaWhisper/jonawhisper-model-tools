@@ -24,7 +24,6 @@ Usage:
 import argparse
 import json
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -49,17 +48,10 @@ def load_models():
 
 
 def convert_model(source: str, output_dir: Path):
-    """Convert a PyTorch model to ONNX using optimum-cli."""
+    """Convert a PyTorch model to ONNX using optimum."""
     print(f"  converting: {source} → ONNX")
-    subprocess.run(
-        [
-            sys.executable, "-m", "optimum.exporters.onnx",
-            "--model", source,
-            "--task", "text2text-generation",
-            str(output_dir),
-        ],
-        check=True,
-    )
+    from optimum.exporters.onnx import main_export
+    main_export(model_name_or_path=source, task="text2text-generation", output=output_dir)
 
     # Show output sizes
     for f in sorted(output_dir.glob("*.onnx")):
@@ -69,10 +61,8 @@ def convert_model(source: str, output_dir: Path):
 def upload_file(repo: str, local_path: Path, remote_name: str):
     """Upload a file to HuggingFace."""
     print(f"  uploading: {remote_name} to {repo}")
-    subprocess.run(
-        ["huggingface-cli", "upload", repo, str(local_path), remote_name],
-        check=True,
-    )
+    from huggingface_hub import HfApi
+    HfApi().upload_file(path_or_fileobj=str(local_path), path_in_repo=remote_name, repo_id=repo)
 
 
 def process_model(model: dict, upload: bool = False, force: bool = False):
@@ -121,9 +111,9 @@ def main():
 
     # Check optimum is installed
     try:
-        import optimum.exporters.onnx  # noqa: F401
+        from optimum.exporters.onnx import main_export  # noqa: F401
     except ImportError:
-        print("ERROR: optimum not installed. Run: pip install optimum[exporters]")
+        print("ERROR: optimum-onnx not installed. Run: pip install optimum-onnx[onnxruntime]")
         sys.exit(1)
 
     models = load_models()
