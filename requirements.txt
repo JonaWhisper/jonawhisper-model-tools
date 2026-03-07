@@ -1,0 +1,3 @@
+optimum[exporters]
+onnxruntime[quantization]
+huggingface-hub

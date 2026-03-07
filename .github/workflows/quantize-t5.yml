@@ -1,0 +1,62 @@
+name: T5 Pipeline (convert + quantize)
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model ID (leave empty for all)"
+        required: false
+        default: ""
+      force:
+        description: "Force re-run all steps"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  matrix:
+    name: Build model list
+    runs-on: ubuntu-latest
+    outputs:
+      models: ${{ steps.list.outputs.models }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Resolve models
+        id: list
+        run: |
+          if [ -n "${{ inputs.model }}" ]; then
+            echo "models=[\"${{ inputs.model }}\"]" >> "$GITHUB_OUTPUT"
+          else
+            echo "models=$(python3 -c "import json; print(json.dumps([m['id'] for m in json.load(open('t5/models.json'))]))")" >> "$GITHUB_OUTPUT"
+          fi
+
+  pipeline:
+    needs: matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        model: ${{ fromJson(needs.matrix.outputs.models) }}
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: "Convert + quantize + upload: ${{ matrix.model }}"
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          ARGS="--upload --model ${{ matrix.model }}"
+          if [ "${{ inputs.force }}" = "true" ]; then
+            ARGS="$ARGS --force"
+          fi
+          python t5/pipeline.py $ARGS
