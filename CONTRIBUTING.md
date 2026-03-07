@@ -18,11 +18,14 @@ Format: `type(scope): description`
 
 - `ci` — GitHub Actions workflows
 - `t5` — T5 correction models
+- `pcs` — PCS punctuation models
+- `bert` — BERT punctuation models
 
 ### Examples
 
 ```
 feat(t5): add new correction model xyz
+feat(pcs): add tokenizer conversion script
 fix(ci): update Python version for compatibility
 refactor(t5): use Python API instead of CLI subprocess
 docs: update README with new model

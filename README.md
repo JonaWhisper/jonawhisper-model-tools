@@ -1,6 +1,6 @@
 # JonaWhisper Model Tools
 
-Scripts and CI workflows for converting, quantizing, and uploading models used by [JonaWhisper](https://github.com/jplot/jona-whisper).
+Scripts and CI workflows for converting, quantizing, and uploading models used by [JonaWhisper](https://github.com/jplot/jona-whisper). Each model type lives in its own directory (`t5/`, etc.).
 
 ## T5 Correction Models
 
@@ -20,7 +20,7 @@ Full pipeline: **Source (PyTorch) → ONNX FP32 → ONNX INT8**
 Individual steps or full pipeline:
 
 ```bash
-pip install optimum[exporters] onnxruntime huggingface-hub
+pip install -r requirements.txt
 
 # Full pipeline: source → ONNX FP32 → INT8 (+ upload)
 python t5/pipeline.py --upload
