@@ -1,2 +1,2 @@
-wikiextractor @ git+https://github.com/attardi/wikiextractor.git@master
+wikiextractor
 huggingface-hub
