@@ -34,9 +34,16 @@ python upload.py en.binary en
 
 Output: `{lang}.binary`
 
+## Adding a language
+
+1. Add the language code to `languages.json` (e.g. `["fr", "en", "de"]`)
+2. Trigger the `Build KenLM models` workflow
+
+That's it. The pipeline works for any language that has a Wikipedia dump.
+
 ## CI
 
-The `Build KenLM models` workflow builds KenLM from source, trains models, and uploads to HuggingFace. Triggered manually from the Actions tab.
+The `Build KenLM models` workflow reads `languages.json`, builds KenLM from source, trains one model per language in parallel, and uploads to HuggingFace. Triggered manually from the Actions tab.
 
 ## Model details
 

@@ -9,11 +9,29 @@ on:
         default: ""
 
 jobs:
+  matrix:
+    name: Build language list
+    runs-on: ubuntu-latest
+    outputs:
+      langs: ${{ steps.list.outputs.langs }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Resolve languages
+        id: list
+        run: |
+          if [ -n "${{ inputs.language }}" ]; then
+            echo "langs=[\"${{ inputs.language }}\"]" >> "$GITHUB_OUTPUT"
+          else
+            echo "langs=$(cat kenlm/languages.json)" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lang: ${{ fromJson(inputs.language != '' && format('["{0}"]', inputs.language) || '["fr","en"]') }}
+        lang: ${{ fromJson(needs.matrix.outputs.langs) }}
       fail-fast: false
 
     steps:
