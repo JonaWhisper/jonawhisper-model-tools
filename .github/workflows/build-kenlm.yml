@@ -24,12 +24,16 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+          cache: "pip"
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake libboost-all-dev \
             zlib1g-dev libbz2-dev liblzma-dev wget
+
+      - name: Install Python dependencies
+        run: pip install -r kenlm/requirements.txt
 
       - name: Build KenLM from source
         run: |
@@ -40,9 +44,6 @@ jobs:
           make -j$(nproc) lmplz build_binary
           sudo cp bin/lmplz bin/build_binary /usr/local/bin/
 
-      - name: Install WikiExtractor
-        run: pip install wikiextractor
-
       - name: "Build ${{ matrix.lang }} model"
         run: |
           cd kenlm
@@ -52,7 +53,6 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          pip install huggingface-hub
           cd kenlm
           python upload.py "${{ matrix.lang }}.binary" "${{ matrix.lang }}"
 
