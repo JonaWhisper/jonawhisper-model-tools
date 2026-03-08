@@ -9,18 +9,24 @@ Pruned trigram language models trained on Wikipedia, used for context-aware spel
 brew install kenlm
 # or build from source: https://github.com/kpu/kenlm
 
-# WikiExtractor
-pip install wikiextractor
+# Python dependencies
+pip install -r kenlm/requirements.txt
 ```
 
-## Training
+## Usage
 
 ```bash
+# Build a model
+cd kenlm
 ./train.sh fr    # French trigram (~50-100 MB)
 ./train.sh en    # English trigram (~60-120 MB)
+
+# Upload to HuggingFace
+python upload.py fr.binary fr
+python upload.py en.binary en
 ```
 
-This will:
+`train.sh` will:
 1. Download the Wikipedia dump for the language
 2. Extract and normalize text (one sentence per line, lowercased)
 3. Train a pruned trigram model with KenLM (`--prune 0 0 1`)
@@ -28,12 +34,9 @@ This will:
 
 Output: `{lang}.binary`
 
-## Upload
+## CI
 
-```bash
-huggingface-cli upload JonaWhisper/kenlm-models fr.binary fr.binary
-huggingface-cli upload JonaWhisper/kenlm-models en.binary en.binary
-```
+The `Build KenLM models` workflow builds KenLM from source, trains models, and uploads to HuggingFace. Triggered manually from the Actions tab.
 
 ## Model details
 

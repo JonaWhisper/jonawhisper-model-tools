@@ -27,6 +27,10 @@ python t5/convert.py --model t5-spell-fr    # Step 1: PyTorch → ONNX
 python t5/quantize.py --model t5-spell-fr   # Step 2: FP32 → INT8
 ```
 
+## CI
+
+The `T5 Pipeline` workflow runs the full pipeline (convert + quantize + upload). Triggered manually from the Actions tab.
+
 ## Adding new models
 
 1. Add an entry to `models.json` with `source` and `repo` fields
