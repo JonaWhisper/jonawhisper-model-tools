@@ -54,16 +54,7 @@ jobs:
         run: |
           pip install huggingface-hub
           cd kenlm
-          BINARY="${{ matrix.lang }}.binary"
-          SIZE=$(stat -c%s "$BINARY")
-          echo "Model: $BINARY ($SIZE bytes)"
-
-          huggingface-cli upload \
-            JonaWhisper/kenlm-models \
-            "$BINARY" "$BINARY" \
-            --token "$HF_TOKEN"
-
-          echo "size_bytes=$SIZE" >> "$GITHUB_OUTPUT"
+          python upload.py "${{ matrix.lang }}.binary" "${{ matrix.lang }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
