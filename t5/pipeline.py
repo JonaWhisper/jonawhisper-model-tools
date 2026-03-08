@@ -107,6 +107,18 @@ def step1_convert(source: str, onnx_dir: Path, force: bool = False):
     from optimum.exporters.onnx import main_export
     main_export(model_name_or_path=source, task="text2text-generation", output=onnx_dir)
 
+    # Copy tokenizer files from source if optimum didn't include them
+    from huggingface_hub import hf_hub_download
+    for name in ["tokenizer.json", "tokenizer_config.json", "special_tokens_map.json"]:
+        dest = onnx_dir / name
+        if not dest.exists():
+            try:
+                path = hf_hub_download(repo_id=source, filename=name)
+                shutil.copy(path, dest)
+                print(f"    copied {name} from source")
+            except Exception:
+                pass  # File doesn't exist in source repo
+
     for f in sorted(onnx_dir.glob("*.onnx")):
         print(f"    {f.name}: {f.stat().st_size / 1024 / 1024:.1f} MB")
 
