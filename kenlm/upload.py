@@ -35,6 +35,13 @@ in [JonaWhisper](https://github.com/jplot/jona-whisper).
 |------|----------|-------|---------|--------------|
 | `fr.binary` | French | 3-gram | `--prune 0 0 1` | 8-bit |
 | `en.binary` | English | 3-gram | `--prune 0 0 1` | 8-bit |
+| `de.binary` | German | 3-gram | `--prune 0 0 1` | 8-bit |
+| `es.binary` | Spanish | 3-gram | `--prune 0 0 1` | 8-bit |
+| `pt.binary` | Portuguese | 3-gram | `--prune 0 0 1` | 8-bit |
+| `it.binary` | Italian | 3-gram | `--prune 0 0 1` | 8-bit |
+| `nl.binary` | Dutch | 3-gram | `--prune 0 0 1` | 8-bit |
+| `pl.binary` | Polish | 3-gram | `--prune 0 0 1` | 8-bit |
+| `ru.binary` | Russian | 3-gram | `--prune 0 0 1` | 8-bit |
 
 ## Training
 
