@@ -15,4 +15,4 @@ All workflows are triggered manually from the Actions tab and require a `HF_TOKE
 
 ## License
 
-GPL-3.0-or-later
+MIT
