@@ -67,7 +67,7 @@ ONNX export of [{source}](https://huggingface.co/{source}) for use with [JonaWhi
 ## License
 
 This model is distributed under the **{license}** license, inherited from the [original model]({source_url}).
-The conversion scripts are under GPL-3.0.
+The conversion scripts are under MIT.
 
 ## Files
 
