@@ -59,7 +59,7 @@ jobs:
 
       - name: Cache KenLM binaries
         id: kenlm-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /usr/local/bin/kenlm-tools
           key: kenlm-${{ runner.os }}-${{ steps.kenlm-rev.outputs.rev }}
@@ -91,7 +91,7 @@ jobs:
           python upload.py "${{ matrix.lang }}.binary" "${{ matrix.lang }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kenlm-${{ matrix.lang }}
           path: kenlm/${{ matrix.lang }}.binary
