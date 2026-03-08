@@ -1,0 +1,73 @@
+name: Build KenLM models
+
+on:
+  workflow_dispatch:
+    inputs:
+      language:
+        description: "Language code (e.g. 'fr', 'en'). Leave empty for all."
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lang: ${{ fromJson(inputs.language != '' && format('["{0}"]', inputs.language) || '["fr","en"]') }}
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libboost-all-dev \
+            zlib1g-dev libbz2-dev liblzma-dev wget
+
+      - name: Build KenLM from source
+        run: |
+          git clone --depth 1 https://github.com/kpu/kenlm.git /tmp/kenlm
+          cd /tmp/kenlm
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          make -j$(nproc) lmplz build_binary
+          sudo cp bin/lmplz bin/build_binary /usr/local/bin/
+
+      - name: Install WikiExtractor
+        run: pip install wikiextractor
+
+      - name: "Build ${{ matrix.lang }} model"
+        run: |
+          cd kenlm
+          ./train.sh ${{ matrix.lang }}
+
+      - name: Upload to HuggingFace
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install huggingface-hub
+          cd kenlm
+          BINARY="${{ matrix.lang }}.binary"
+          SIZE=$(stat -c%s "$BINARY")
+          echo "Model: $BINARY ($SIZE bytes)"
+
+          huggingface-cli upload \
+            JonaWhisper/kenlm-models \
+            "$BINARY" "$BINARY" \
+            --token "$HF_TOKEN"
+
+          echo "size_bytes=$SIZE" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kenlm-${{ matrix.lang }}
+          path: kenlm/${{ matrix.lang }}.binary
+          retention-days: 30
