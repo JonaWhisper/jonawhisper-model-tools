@@ -53,14 +53,30 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r kenlm/requirements.txt
 
+      - name: Get KenLM latest commit hash
+        id: kenlm-rev
+        run: echo "rev=$(git ls-remote https://github.com/kpu/kenlm.git HEAD | cut -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache KenLM binaries
+        id: kenlm-cache
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/kenlm-tools
+          key: kenlm-${{ runner.os }}-${{ steps.kenlm-rev.outputs.rev }}
+
       - name: Build KenLM from source
+        if: steps.kenlm-cache.outputs.cache-hit != 'true'
         run: |
           git clone --depth 1 https://github.com/kpu/kenlm.git /tmp/kenlm
           cd /tmp/kenlm
           mkdir build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
           make -j$(nproc) lmplz build_binary
-          sudo cp bin/lmplz bin/build_binary /usr/local/bin/
+          mkdir -p /usr/local/bin/kenlm-tools
+          cp bin/lmplz bin/build_binary /usr/local/bin/kenlm-tools/
+
+      - name: Install KenLM tools
+        run: sudo cp /usr/local/bin/kenlm-tools/* /usr/local/bin/
 
       - name: "Build ${{ matrix.lang }} model"
         run: |
