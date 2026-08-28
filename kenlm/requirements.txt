@@ -1,2 +1,2 @@
-wikiextractor
-huggingface-hub
+wikiextractor==3.1.0
+huggingface-hub==1.29.0
